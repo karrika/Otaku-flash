@@ -1,5 +1,5 @@
-python3 build26romF6k.py happybird.a26
-cp rom.c ~/raspberry-pi-pico/pico/pico-examples/pico_rom
+python3 build26romF6.py happybird.a26
+mv rom.c ~/raspberry-pi-pico/pico/pico-examples/pico_rom
 pushd ~/raspberry-pi-pico/pico/pico-examples/build
 make
 popd
