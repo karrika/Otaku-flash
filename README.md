@@ -6,8 +6,12 @@ The logic in this card is based on Raspberrypi Pico
 build26rom4k.py games tested:
 - Donkey Kong (198x).a26
 
-build26rom16k.py games tested:
-- Happy Bird
+build26romF6.py games tested:
+- Happy Bird by @bsteux
+
+build26romF4.py games tested:
+- slideboy_final.bin by 
 
 build78rom16k.py games tested:
 - Centipede (NTSC) (Atari) (1978).a78
+
