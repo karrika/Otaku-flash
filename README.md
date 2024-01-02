@@ -23,3 +23,5 @@ build26romF4.py games tested:
 build78rom16k.py games tested:
 - Centipede (NTSC) (Atari) (1978).a78
 
+slow26romF6.py games tested:
+- Happy Bird by @bsteux
