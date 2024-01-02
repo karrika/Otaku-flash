@@ -10,7 +10,7 @@ build26romF6.py games tested:
 - Happy Bird by @bsteux
 
 build26romF4.py games tested:
-- slideboy_final.bin by 
+- slideboy_final.bin by @vhzc
 
 build78rom16k.py games tested:
 - Centipede (NTSC) (Atari) (1978).a78
