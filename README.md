@@ -17,6 +17,8 @@ my Atari 7800 console. The schottky diode in the cart prevents the
 powerbank to power on the console when the cart has power but the
 console has not.
 
+The new Atari 2600+ works with the cart without any powerbank startup tricks.
+
 The scripts starting with 'slow' create images where the data is fetched
 from the flash. The maximum speed for this is 291MHz and it is too slow
 for a real Atari 7800 console. But it works just fine for the Atari 2600+.
