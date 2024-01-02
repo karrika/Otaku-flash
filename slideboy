@@ -1,0 +1,6 @@
+python3 build26romF4.py slideboy_final.bin
+cp rom.c ~/raspberry-pi-pico/pico/pico-examples/pico_rom
+pushd ~/raspberry-pi-pico/pico/pico-examples/build
+make
+popd
+mv ~/raspberry-pi-pico/pico/pico-examples/build/pico_rom/pico_rom.uf2 slideboy.uf2
