@@ -32,8 +32,8 @@ build78rom16k.py games tested:
 - Centipede (NTSC) (Atari) (1978).a78
 
 The scripts starting with 'slow' create images where the data is fetched
-from the flash. *The maximum speed for this is 291MHz and it is too slow
-for a real Atari 7800 console.* But it works just fine for the Atari 2600+.
+from the flash. **The maximum speed for this is 291MHz and it is too slow
+for a real Atari 7800 console.** But it works just fine for the Atari 2600+.
 
 slow26romF6.py games tested:
 - Happy Bird by @bsteux
