@@ -2,6 +2,7 @@
 A single game flash card for Atari 2600, Atari 7800 and Atari 2600+
 
 The logic in this card is based on Raspberrypi Pico
+(https://github.com/karrika/Otaku-flash/blob/main/doc/Pico2600f.png)
 
 There is two sets of build scripts. The scripts starting with 'build'
 are creating images to be run from RAM. The speed is 400MHz in order
