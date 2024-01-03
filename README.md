@@ -19,10 +19,6 @@ console has not.
 
 The new Atari 2600+ works with the cart without any powerbank startup tricks.
 
-The scripts starting with 'slow' create images where the data is fetched
-from the flash. The maximum speed for this is 291MHz and it is too slow
-for a real Atari 7800 console. But it works just fine for the Atari 2600+.
-
 build26rom4k.py games tested:
 - Donkey Kong (198x).a26
 
@@ -34,6 +30,10 @@ build26romF4.py games tested:
 
 build78rom16k.py games tested:
 - Centipede (NTSC) (Atari) (1978).a78
+
+The scripts starting with 'slow' create images where the data is fetched
+from the flash. *The maximum speed for this is 291MHz and it is too slow
+for a real Atari 7800 console.* But it works just fine for the Atari 2600+.
 
 slow26romF6.py games tested:
 - Happy Bird by @bsteux
