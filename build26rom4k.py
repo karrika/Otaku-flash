@@ -28,17 +28,18 @@ void put_data_on_bus(int);
 void setup_rom_contents();
 
 #define ROM_SIZE 4096
+#define ROM_IN_USE 4096
 #define ROM_MASK 4095
 
 uint8_t rom_contents[ROM_SIZE] = {};
 uint16_t addr;
-uint16_t last_addr;
-
+uint8_t rom_in_use;
+uint8_t new_rom_in_use;
 
 int main() {
     // Specify contents of emulated ROM.
     setup_rom_contents();
-    last_addr = ROM_SIZE;
+    rom_in_use = 1;
 
     // Set system clock speed.
     // 400 MHz
@@ -51,17 +52,19 @@ int main() {
     // Continually check address lines and
     // put associated data on bus.
     while (true) {
+        // Set the data on the bus anyway
         addr = gpio_get_all();
-        if ((addr & ROM_SIZE) != last_addr) {
-            last_addr = ROM_SIZE - last_addr;
-            if (last_addr) {
+        put_data_on_bus(addr);
+
+        // Disable data bus output if it was a ROM access
+	new_rom_in_use = (addr & ROM_IN_USE) ? 1 : 0;
+        if (new_rom_in_use != rom_in_use) {
+            rom_in_use = 1 - rom_in_use;
+            if (rom_in_use) {
                 data_bus_output();
             } else {
                 data_bus_input();
             }
-        }
-        if (last_addr) {
-            put_data_on_bus(addr);
         }
     }
 }

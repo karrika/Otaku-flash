@@ -20,6 +20,9 @@ console has not.
 
 The new Atari 2600+ works with the cart without any powerbank startup tricks.
 
+build26rom2k.py games tested:
+- Breakout - Breakaway IV (1978) (Atari) (PAL) [!].a26
+
 build26rom4k.py games tested:
 - Donkey Kong (198x).a26
 
