@@ -10,7 +10,7 @@ class rom:
 /*
 * PicoROM
 * Simulate a 32k Atari 2600 ROM chip with F4 bankswitching on a Raspberry Pi Pico.
-* Karri Kaksonen, 2024
+* Karri Kaksonen, 2023
 * based on work by
 * Nick Bild 2021
 */
@@ -21,25 +21,26 @@ class rom:
 #include "pin_definitions.h"
 #include <stdlib.h>
 
-void setup_gpio();
 void data_bus_input();
 void data_bus_output();
 void put_data_on_bus(int);
 void setup_rom_contents();
 
-#define ROM_SIZE 4096
-#define ROM_MASK 4095
-#define ALL_ADDR_MASK 8191
+#define ROM_SIZE 0x1000
+#define ROM_IN_USE 0x1000
+#define ROM_MASK 0x0fff
+#define ADDR_MASK 0x1fff
 
 uint8_t rom_contents[8*ROM_SIZE] = {};
 uint16_t bank;
 uint16_t addr;
-uint16_t last_addr;
+uint8_t rom_in_use;
+uint8_t new_rom_in_use;
 
 int main() {
     // Specify contents of emulated ROM.
     setup_rom_contents();
-    last_addr = ROM_SIZE;
+    rom_in_use = 1;
     bank = 0;
 
     // Set system clock speed.
@@ -48,132 +49,56 @@ int main() {
     set_sys_clock_pll(1600000000, 4, 1);
     
     // GPIO setup.
-    setup_gpio();
+    gpio_init_mask(0x7fffff);          // All pins.
+    gpio_set_dir_in_masked(0x7fff);    // Address pins.
+    gpio_set_dir_out_masked(0x7f8000); // Data pins.
     
     // Continually check address lines and
     // put associated data on bus.
     while (true) {
-        addr = gpio_get_all() & ALL_ADDR_MASK;
-        if ((addr & ROM_SIZE) != last_addr) {
-            last_addr = ROM_SIZE - last_addr;
-            if (last_addr) {
-                data_bus_output();
+        // Set the data on the bus anyway
+        addr = gpio_get_all();
+        gpio_put_masked(0x7f8000, rom_contents[(addr & ROM_MASK) + bank] << 15);
+        // Disable data bus output if it was a ROM access
+	new_rom_in_use = (addr & ROM_IN_USE) ? 1 : 0;
+        if (new_rom_in_use != rom_in_use) {
+            rom_in_use = 1 - rom_in_use;
+            if (rom_in_use) {
+                gpio_set_dir_out_masked(0x7f8000);
             } else {
-                data_bus_input();
+                gpio_set_dir_in_masked(0x7f8000);
             }
         }
-        if (last_addr) {
-            put_data_on_bus(addr);
-            switch (addr) {
-            case 0x1ff4:
-                bank = 0;
-                break;
-            case 0x1ff5:
-                bank = 4096;
-                break;
-            case 0x1ff6:
-                bank = 8192;
-                break;
-            case 0x1ff7:
-                bank = 12288;
-                break;
-            case 0x1ff8:
-                bank = 16384;
-                break;
-            case 0x1ff9:
-                bank = 20480;
-                break;
-            case 0x1ffa:
-                bank = 24576;
-                break;
-            case 0x1ffb:
-                bank = 28672;
-                break;
-            default:
-                break;
-            }
+        // Do bankswitching
+        switch (addr & ADDR_MASK) {
+        case 0x1ff4:
+            bank = 0;
+            break;
+        case 0x1ff5:
+            bank = 4096;
+            break;
+        case 0x1ff6:
+            bank = 8192;
+            break;
+        case 0x1ff7:
+            bank = 12288;
+            break;
+        case 0x1ff8:
+            bank = 16384;
+            break;
+        case 0x1ff9:
+            bank = 20480;
+            break;
+        case 0x1ffa:
+            bank = 24576;
+            break;
+        case 0x1ffb:
+            bank = 28672;
+            break;
+        default:
+            break;
         }
     }
-}
-
-void setup_gpio() {
-    // Address pins.
-    gpio_init(A0);
-    gpio_set_dir(A0, GPIO_IN);
-    gpio_init(A1);
-    gpio_set_dir(A1, GPIO_IN);
-    gpio_init(A2);
-    gpio_set_dir(A2, GPIO_IN);
-    gpio_init(A3);
-    gpio_set_dir(A3, GPIO_IN);
-    gpio_init(A4);
-    gpio_set_dir(A4, GPIO_IN);
-    gpio_init(A5);
-    gpio_set_dir(A5, GPIO_IN);
-    gpio_init(A6);
-    gpio_set_dir(A6, GPIO_IN);
-    gpio_init(A7);
-    gpio_set_dir(A7, GPIO_IN);
-    gpio_init(A8);
-    gpio_set_dir(A8, GPIO_IN);
-    gpio_init(A9);
-    gpio_set_dir(A9, GPIO_IN);
-    gpio_init(A10);
-    gpio_set_dir(A10, GPIO_IN);
-    gpio_init(A11);
-    gpio_set_dir(A11, GPIO_IN);
-    gpio_init(A12);
-    gpio_set_dir(A12, GPIO_IN);
-
-    // Data pins.
-    gpio_init(D0);
-    gpio_set_dir(D0, GPIO_OUT);
-    gpio_init(D1);
-    gpio_set_dir(D1, GPIO_OUT);
-    gpio_init(D2);
-    gpio_set_dir(D2, GPIO_OUT);
-    gpio_init(D3);
-    gpio_set_dir(D3, GPIO_OUT);
-    gpio_init(D4);
-    gpio_set_dir(D4, GPIO_OUT);
-    gpio_init(D5);
-    gpio_set_dir(D5, GPIO_OUT);
-    gpio_init(D6);
-    gpio_set_dir(D6, GPIO_OUT);
-    gpio_init(D7);
-    gpio_set_dir(D7, GPIO_OUT);
-}
-
-void data_bus_input() {
-    // Data pins.
-    gpio_set_dir(D0, GPIO_IN);
-    gpio_set_dir(D1, GPIO_IN);
-    gpio_set_dir(D2, GPIO_IN);
-    gpio_set_dir(D3, GPIO_IN);
-    gpio_set_dir(D4, GPIO_IN);
-    gpio_set_dir(D5, GPIO_IN);
-    gpio_set_dir(D6, GPIO_IN);
-    gpio_set_dir(D7, GPIO_IN);
-}
-
-void data_bus_output() {
-    // Data pins.
-    gpio_set_dir(D0, GPIO_OUT);
-    gpio_set_dir(D1, GPIO_OUT);
-    gpio_set_dir(D2, GPIO_OUT);
-    gpio_set_dir(D3, GPIO_OUT);
-    gpio_set_dir(D4, GPIO_OUT);
-    gpio_set_dir(D5, GPIO_OUT);
-    gpio_set_dir(D6, GPIO_OUT);
-    gpio_set_dir(D7, GPIO_OUT);
-}
-
-void put_data_on_bus(int address) {
-    // int data = rom_contents[address];
-
-    // gpio mask = 8355840; // i.e.: 11111111000000000000000
-    // Shift data 15 bits to put it in correct position to match data pin defintion.
-    gpio_put_masked(8355840, rom_contents[(address & ROM_MASK) + bank] << 15);
 }
 
 void setup_rom_contents() {
