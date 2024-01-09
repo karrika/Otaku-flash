@@ -9,7 +9,7 @@ class rom:
     def writedata(self, f):
         code = '''
 /*
-* PicoROM
+* Otaku-flash
 * Simulate a 16k Atari 7800 ROM chip with a Raspberry Pi Pico.
 * Karri Kaksonen, 2023
 * based on work by
@@ -22,11 +22,6 @@ class rom:
 #include "pin_definitions.h"
 #include <stdlib.h>
 
-void setup_gpio();
-void data_bus_input();
-void data_bus_output();
-int get_requested_address();
-void put_data_on_bus(int);
 void setup_rom_contents();
 
 #define ROM_SIZE 0x4000
