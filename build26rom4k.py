@@ -8,7 +8,7 @@ class rom:
     def writedata(self, f):
         code = '''
 /*
-* PicoROM
+* Otaku-flash
 * Simulate a 4k Atari 2600 ROM chip with a Raspberry Pi Pico.
 * Karri Kaksonen, 2023
 * based on work by
@@ -20,10 +20,6 @@ class rom:
 #include "hardware/vreg.h"
 #include <stdlib.h>
 
-void setup_gpio();
-void data_bus_input();
-void data_bus_output();
-void put_data_on_bus(int);
 void setup_rom_contents();
 
 #define ROM_SIZE 4096

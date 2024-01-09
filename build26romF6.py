@@ -8,7 +8,7 @@ class rom:
     def writedata(self, f):
         code = '''
 /*
-* PicoROM
+* Otaku-flash
 * Simulate a 16k Atari 2600 ROM chip with F6 bankswitching on a Raspberry Pi Pico.
 * Karri Kaksonen, 2023
 * based on work by
@@ -20,9 +20,6 @@ class rom:
 #include "hardware/vreg.h"
 #include <stdlib.h>
 
-void data_bus_input();
-void data_bus_output();
-void put_data_on_bus(int);
 void setup_rom_contents();
 
 #define ROM_SIZE 0x1000
