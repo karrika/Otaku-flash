@@ -18,7 +18,6 @@ class rom:
 #include "pico/stdlib.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
-#include "pin_definitions.h"
 #include <stdlib.h>
 
 void setup_gpio();
