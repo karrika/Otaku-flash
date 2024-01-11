@@ -35,3 +35,6 @@ build26romF4.py games tested:
 build78rom16k.py games tested:
 - Centipede (NTSC) (Atari) (1978).a78
 
+build78rom32k.py games tested:
+- xshuriken by Fabrizio Caruso
+
