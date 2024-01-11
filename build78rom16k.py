@@ -30,7 +30,7 @@ void setup_rom_contents();
 #define ADDR_MASK 0x7FFF
 
 uint8_t rom_contents[ROM_SIZE] = {};
-uint16_t addr;
+uint32_t addr;
 uint8_t rom_in_use;
 uint8_t new_rom_in_use;
 
