@@ -23,6 +23,9 @@ build26rom2k.py games tested:
 build26rom4k.py games tested:
 - Donkey Kong (198x).a26
 
+build26romF8.py games tested:
+- Battlezone (1983) (Atari) [!].a26
+
 build26romF6.py games tested:
 - Happy Bird by @bsteux
 
