@@ -3,4 +3,4 @@ mv rom.c ~/raspberry-pi-pico/pico/pico-examples/pico_rom
 pushd ~/raspberry-pi-pico/pico/pico-examples/build
 make
 popd
-mv ~/raspberry-pi-pico/pico/pico-examples/build/pico_rom/pico_rom.uf2 centipede.uf2
+mv ~/raspberry-pi-pico/pico/pico-examples/build/pico_rom/pico_rom.uf2 centipede16k.uf2
