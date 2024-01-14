@@ -21,6 +21,7 @@ class rom:
 #include "hardware/vreg.h"
 #include "pin_definitions.h"
 #include <stdlib.h>
+#include <string.h>
 
 void setup_rom_contents();
 
@@ -29,10 +30,28 @@ void setup_rom_contents();
 #define ROM_MASK 0x7fff
 #define ADDR_MASK 0xFFFF
 
+uint8_t game_contents[ROM_SIZE] __attribute__ ((aligned(ROM_SIZE))) = {
+'''
+        f.write(code)
+        for i in range(0, len(self.data), 8):
+            f.write('    ')
+            for j in range(7):
+                f.write("0x{:02x}".format(self.data[i + j]) + ', ')
+            if i + 7 < len(self.data) - 1:
+                f.write("0x{:02x}".format(self.data[i + 7]) + ',\n')
+            else:
+                f.write("0x{:02x}".format(self.data[i + 7]))
+        code = '''
+};
+
 uint8_t rom_contents[ROM_SIZE] = {};
 uint32_t addr;
 uint8_t rom_in_use;
 uint8_t new_rom_in_use;
+
+void setup_rom_contents() {
+    memcpy(rom_contents, game_contents, ROM_SIZE);
+} 
 
 int main() {
     // Specify contents of emulated ROM.
@@ -53,10 +72,11 @@ int main() {
     // Continually check address lines and
     // put associated data on bus.
     while (true) {
-        // Set the data on the bus anyway
+        // Get address
         addr = gpio_get_all();
         // Check for A15
 	new_rom_in_use = (addr & 0x4000000) ? 1 : 0;
+        // Set the data on the bus anyway
         gpio_put_masked(0x7f8000, rom_contents[addr & ROM_MASK] << 15);
 
         // Disable data bus output if it was a ROM access
@@ -71,14 +91,8 @@ int main() {
     }
 }
 
-void setup_rom_contents() {
 '''
         f.write(code)
-        j = 0
-        for i in self.data:
-            f.write('    rom_contents[' + str(j) + '] = ' + str(i) + ';\n')
-            j = j + 1;
-        f.write('}\n')
 
 fname=str(sys.argv[len(sys.argv)-1])
 r = rom(fname)
