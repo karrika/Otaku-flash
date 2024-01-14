@@ -18,7 +18,6 @@ class rom:
 #include "pico/stdlib.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
-#include "pin_definitions.h"
 #include <stdlib.h>
 
 #define ROM_SIZE 0x0800
@@ -28,12 +27,14 @@ class rom:
 uint8_t rom_contents[ROM_SIZE] __attribute__ ((aligned(ROM_SIZE))) = {
 '''
         f.write(code)
-        j = 0
-        for i in self.data:
-            f.write('    ' + str(i))
-            if j < len(self.data) - 1:
-                f.write(',\n')
-            j = j + 1;
+        for i in range(0, len(self.data), 8):
+            f.write('    ')
+            for j in range(7):
+                f.write("0x{:02x}".format(self.data[i + j]) + ', ')
+            if i + 7 < len(self.data) - 1:
+                f.write("0x{:02x}".format(self.data[i + 7]) + ',\n')
+            else:
+                f.write("0x{:02x}".format(self.data[i + 7]))
         code = '''
 };
 
@@ -57,8 +58,9 @@ int main() {
     // Continually check address lines and
     // put associated data on bus.
     while (true) {
-        // Set the data on the bus anyway
+        // Get address
         addr = gpio_get_all();
+        // Put data corresponding to address
         gpio_put_masked(0x7f8000, rom_contents[addr & ROM_MASK] << 15);
         // Disable data bus output if it was a ROM access
 	new_rom_in_use = (addr & ROM_IN_USE) ? 1 : 0;
