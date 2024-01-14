@@ -61,8 +61,9 @@ int main() {
     // Continually check address lines and
     // put associated data on bus.
     while (true) {
-        // Set the data on the bus anyway
+        // Get address
         addr = gpio_get_all();
+        // Put data corresponding to address
         gpio_put_masked(0x7f8000, rom_contents[(addr & ROM_MASK) + bank] << 15);
         // Disable data bus output if it was a ROM access
 	new_rom_in_use = (addr & ROM_IN_USE) ? 1 : 0;
