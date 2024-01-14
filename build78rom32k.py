@@ -44,13 +44,13 @@ uint8_t game_contents[ROM_SIZE] __attribute__ ((aligned(ROM_SIZE))) = {
         code = '''
 };
 
-uint8_t rom_contents[ROM_SIZE] = {};
+uint8_t rom_contents[0x10000] = {};
 uint32_t addr;
 uint8_t rom_in_use;
 uint8_t new_rom_in_use;
 
 void setup_rom_contents() {
-    memcpy(rom_contents, game_contents, ROM_SIZE);
+    memcpy(rom_contents + 0x8000, game_contents, ROM_SIZE);
 } 
 
 int main() {
@@ -76,8 +76,12 @@ int main() {
         addr = gpio_get_all();
         // Check for A15
 	new_rom_in_use = (addr & 0x4000000) ? 1 : 0;
+        addr &= 0x7fff;
+        if (new_rom_in_use) {
+             addr |= 0x8000;
+        }
         // Set the data on the bus anyway
-        gpio_put_masked(0x7f8000, rom_contents[addr & ROM_MASK] << 15);
+        gpio_put_masked(0x7f8000, rom_contents[addr] << 15);
 
         // Disable data bus output if it was a ROM access
         if (new_rom_in_use != rom_in_use) {
