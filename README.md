@@ -37,4 +37,8 @@ build78rom16k.py games tested:
 
 build78rom32k.py games tested:
 - xshuriken by Fabrizio Caruso
+- Pirate Cove by @karri
+
+build78rom48k.py games tested:
+- Galaga (PAL) (Atari) (1987) (5990A9F8).a78
 
