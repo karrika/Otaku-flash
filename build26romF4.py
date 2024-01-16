@@ -109,10 +109,11 @@ int main() {
 '''
         f.write(code)
 
-fname=str(sys.argv[len(sys.argv)-1])
-r = rom(fname)
-fname = 'rom.c'
-f = open(fname, 'w')
-r.writedata(f)
-f.close()
+if __name__ == '__main__':
+    fname=str(sys.argv[len(sys.argv)-1])
+    r = rom(fname)
+    fname = 'rom.c'
+    f = open(fname, 'w')
+    r.writedata(f)
+    f.close()
 
