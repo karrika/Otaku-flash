@@ -1,6 +1,0 @@
-python3 build26rom2k.py Breakout\ -\ Breakaway\ IV\ \(1978\)\ \(Atari\)\ \(PAL\)\ \[\!\].a26
-mv rom.c ~/raspberry-pi-pico/pico/pico-examples/pico_rom
-pushd ~/raspberry-pi-pico/pico/pico-examples/build
-make
-popd
-mv ~/raspberry-pi-pico/pico/pico-examples/build/pico_rom/pico_rom.uf2 breakout2k.uf2
