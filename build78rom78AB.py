@@ -62,6 +62,7 @@ int main() {
     // Specify contents of emulated ROM.
     setup_rom_contents();
     rom_in_use = 1;
+    // Set default bank to title page
     bank = 0x4000;
 
     // Set system clock speed.
@@ -98,6 +99,8 @@ int main() {
 
         // Check for A14
         if (addr & 0x4000) new_rom_in_use = 1;
+        // Check for RW
+        if (readwrite == 0) new_rom_in_use = 0;
         // Disable data bus output if it was a ROM access
         if (new_rom_in_use != rom_in_use) {
             rom_in_use = 1 - rom_in_use;
@@ -110,15 +113,13 @@ int main() {
 
         // Bankswitch
         if ((readwrite == 0) && (addr > 0x7fff)) {
-            switch ((gpio_get_all() >> 15) & 0xff) {
-            case 1:
+            // Check for 0x01
+            if (gpio_get_all() & 0x8000) {
+                // Switch to flying mode
                 bank = 0;
-                break;
-            case 0:
+            } else {
+                // Switch to title page
                 bank = 0x4000;
-                break;
-            default:
-                break;
             }
         }
     }
