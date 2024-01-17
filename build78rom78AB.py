@@ -27,9 +27,6 @@ class rom:
 #include <string.h>
 
 #define ROM_SIZE 0x10000
-#define ROM_IN_USE 0xC000
-#define ROM_MASK 0xffff
-#define ADDR_MASK 0xFFFF
 
 const uint8_t game_contents[ROM_SIZE] = {
 '''
