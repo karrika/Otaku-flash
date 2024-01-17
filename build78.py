@@ -3,6 +3,7 @@ import subprocess
 import build78rom16k
 import build78rom32k
 import build78rom48k
+import build78rom78AB
 
 class rom:
     def __init__(self, fname):
@@ -37,6 +38,10 @@ class rom:
         if self.typeA & 16:
             self.CartType.append('SOUPER')
             self.type = b'Not supported'
+        if self.typeA & 2:
+            self.CartType.append('ABSOLUTE')
+            self.type = b'78AB'
+            print(self.type)
         if self.typeA & 64:
             self.CartType.append('EXRAM/M2')
             self.type = b'Not supported'
@@ -54,9 +59,6 @@ class rom:
             self.type = b'Not supported'
         if self.typeA & 4:
             self.CartType.append('POKEY @0440')
-            self.type = b'Not supported'
-        if self.typeA & 2:
-            self.CartType.append('ABSOLUTE')
             self.type = b'Not supported'
         if self.typeA & 1:
             self.CartType.append('ACTIVISION')
@@ -106,7 +108,8 @@ class rom:
         self.slotdevice = self.header[64]
         if self.slotdevice != 0:
             print('Slot device:', self.slotdevice)
-            self.type = b'Not supported'
+            if self.type != b'78AB':
+                self.type = b'Not supported'
 
     def createrom(self):
         self.carttype()
@@ -124,6 +127,12 @@ class rom:
             f.close()
         elif self.type == b'48K':
             r = build78rom48k.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+        elif self.type == b'78AB':
+            r = build78rom78AB.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
             r.writedata(f)
