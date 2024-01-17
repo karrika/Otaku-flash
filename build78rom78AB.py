@@ -62,7 +62,7 @@ int main() {
     // Specify contents of emulated ROM.
     setup_rom_contents();
     rom_in_use = 1;
-    bank = 0;
+    bank = 0x4000;
 
     // Set system clock speed.
     // 400 MHz
@@ -93,7 +93,7 @@ int main() {
         if (addr > 0x7fff) {
             gpio_put_masked(0x7f8000, rom_contents[addr] << 15);
         } else {
-            gpio_put_masked(0x7f8000, rom_contents[addr + bank] << 15);
+            gpio_put_masked(0x7f8000, rom_contents[(addr & 0x3fff) + bank] << 15);
         }
 
         // Check for A14
@@ -109,12 +109,12 @@ int main() {
         }
 
         // Bankswitch
-        if ((readwrite == 0) && (addr == 0x8000)) {
+        if ((readwrite == 0) && (addr > 0x7fff)) {
             switch ((gpio_get_all() >> 15) & 0xff) {
-            case 0:
+            case 1:
                 bank = 0;
                 break;
-            case 1:
+            case 0:
                 bank = 0x4000;
                 break;
             default:
