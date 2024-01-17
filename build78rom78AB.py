@@ -26,8 +26,6 @@ class rom:
 #include "pin_definitions.h"
 #include <string.h>
 
-void setup_rom_contents();
-
 #define ROM_SIZE 0x10000
 #define ROM_IN_USE 0xC000
 #define ROM_MASK 0xffff
@@ -48,19 +46,16 @@ const uint8_t game_contents[ROM_SIZE] = {
 };
 
 uint8_t rom_contents[0x10000] = {};
-uint32_t addr;
-uint32_t bank;
-uint8_t rom_in_use;
-uint8_t new_rom_in_use;
-uint8_t readwrite;
-
-void setup_rom_contents() {
-    memcpy(rom_contents, game_contents, 0x10000);
-} 
 
 int main() {
+    uint32_t addr;
+    uint16_t bank;
+    uint8_t rom_in_use;
+    uint8_t new_rom_in_use;
+    uint8_t readwrite;
+
     // Specify contents of emulated ROM.
-    setup_rom_contents();
+    memcpy(rom_contents, game_contents, 0x10000);
     rom_in_use = 1;
     // Set default bank to title page
     bank = 0x4000;
