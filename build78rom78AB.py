@@ -45,10 +45,10 @@ const uint8_t game_contents[ROM_SIZE] = {
 uint8_t rom_contents[0x10000] = {};
 
 int main() {
+    uint32_t rawaddr;
     uint32_t addr;
     uint16_t bank;
     uint8_t rom_in_use;
-    uint8_t new_rom_in_use;
     uint8_t readwrite;
 
     // Specify contents of emulated ROM.
@@ -73,45 +73,55 @@ int main() {
     // put associated data on bus.
     while (true) {
         // Get address
-        addr = gpio_get_all();
+        rawaddr = gpio_get_all();
+        addr = rawaddr & 0x7fff;
         // Check for A15
-	new_rom_in_use = (addr & 0x4000000) ? 1 : 0;
-        // Check for RW
-	readwrite = (addr & 0x2000000) ? 1 : 0;
-        addr &= 0x7fff;
-        if (new_rom_in_use) {
-             addr |= 0x8000;
-        }
-        // Set the data on the bus anyway
-        if (addr > 0x7fff) {
+        if (rawaddr & 0x4000000) {
+            addr |= 0x8000;
+            // Set the data on the bus
             gpio_put_masked(0x7f8000, rom_contents[addr] << 15);
-        } else {
-            gpio_put_masked(0x7f8000, rom_contents[(addr & 0x3fff) + bank] << 15);
-        }
-
-        // Check for A14
-        if (addr & 0x4000) new_rom_in_use = 1;
-        // Check for RW
-        if (readwrite == 0) new_rom_in_use = 0;
-        // Disable data bus output if it was a ROM access
-        if (new_rom_in_use != rom_in_use) {
-            rom_in_use = 1 - rom_in_use;
-            if (rom_in_use) {
-                gpio_set_dir_out_masked(0x7f8000);
+            // Check for RW
+	    if (rawaddr & 0x2000000) {
+                // Read cycle
+                if (!rom_in_use) {
+                    gpio_set_dir_out_masked(0x7f8000);
+                    rom_in_use = 1;
+                }
             } else {
-                gpio_set_dir_in_masked(0x7f8000);
+                // Write cycle to ROM
+                rawaddr = gpio_get_all() & 0x6007fff;
+                // Check for bankswitch
+                if (rawaddr == 0x4000000) {
+                    // Bankswitching write
+                    gpio_set_dir_in_masked(0x7f8000);
+                    // Check for 0x01
+                    rawaddr = gpio_get_all();
+                    if ((rawaddr & 0x7f8000) == 0x008000) {
+                        // Switch to flying mode
+                        bank = 0;
+                    } else {
+                        if ((rawaddr & 0x7f8000) == 0x010000) {
+                            // Switch to title page
+                            bank = 0x4000;
+                        }
+                    }
+                    rom_in_use = 0;
+                }
             }
-        }
-
-        // Bankswitch
-        if ((readwrite == 0) && (addr > 0x7fff)) {
-            // Check for 0x01
-            if (gpio_get_all() & 0x8000) {
-                // Switch to flying mode
-                bank = 0;
+        } else {
+            // Check for A14
+            if (addr & 0x4000) {
+                // Set the data on the bus
+                gpio_put_masked(0x7f8000, rom_contents[(addr & 0x3fff) + bank] << 15);
+                if (!rom_in_use) {
+                    gpio_set_dir_out_masked(0x7f8000);
+                    rom_in_use = 1;
+                }
             } else {
-                // Switch to title page
-                bank = 0x4000;
+                if (rom_in_use) {
+                    gpio_set_dir_in_masked(0x7f8000);
+                    rom_in_use = 0;
+                }
             }
         }
     }
