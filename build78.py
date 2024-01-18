@@ -3,7 +3,7 @@ import subprocess
 import build78rom16k
 import build78rom32k
 import build78rom48k
-import build78rom78AB
+import build78romAB
 import build78romSG
 import build78romSGEF
 import build78romSGER
@@ -55,7 +55,7 @@ class rom:
             self.type = b'Not supported'
         if self.typeA & 2:
             self.CartType.append('ABSOLUTE')
-            self.type = b'78AB'
+            self.type = b'AB'
             print(self.type)
         if self.typeA & 64:
             self.CartType.append('EXRAM/M2')
@@ -117,7 +117,7 @@ class rom:
         self.slotdevice = self.header[64]
         if self.slotdevice != 0:
             print('Slot device:', self.slotdevice)
-            if self.type == b'78AB':
+            if self.type == b'AB':
                 pass
             elif self.type == b'SGEF':
                 pass
@@ -144,8 +144,8 @@ class rom:
             f = open(fname, 'w')
             r.writedata(f)
             f.close()
-        elif self.type == b'78AB':
-            r = build78rom78AB.rom(self.fname)
+        elif self.type == b'AB':
+            r = build78romAB.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
             r.writedata(f)
