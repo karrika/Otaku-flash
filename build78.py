@@ -4,6 +4,8 @@ import build78rom16k
 import build78rom32k
 import build78rom48k
 import build78rom78AB
+import build78romSG
+import build78romSGEF
 
 class rom:
     def __init__(self, fname):
@@ -31,7 +33,13 @@ class rom:
         self.typeB = self.header[54]
         if self.typeB & 2:
             self.CartType.append('SUPER')
-            self.type = b'SC'
+            self.type = b'SG'
+        if self.typeB & 16:
+            self.CartType.append('EXFIX')
+            if self.type == b'SG':
+                self.type = b'SGEF'
+            else:
+                self.type = b'Not supported'
         if self.typeA & 32:
             self.CartType.append('BANKSET')
             self.type = b'Not supported'
@@ -72,9 +80,6 @@ class rom:
         if self.typeB & 32:
             self.CartType.append('EXRAM/X2')
             self.type = b'Not supported'
-        if self.typeB & 16:
-            self.CartType.append('EXFIX')
-            self.type = b'Not supported'
         if self.typeB & 1:
             self.CartType.append('POKEYU@4000')
             self.type = b'Not supported'
@@ -108,7 +113,11 @@ class rom:
         self.slotdevice = self.header[64]
         if self.slotdevice != 0:
             print('Slot device:', self.slotdevice)
-            if self.type != b'78AB':
+            if self.type == b'78AB':
+                pass
+            elif self.type == b'SGEF':
+                pass
+            else:
                 self.type = b'Not supported'
 
     def createrom(self):
@@ -137,8 +146,14 @@ class rom:
             f = open(fname, 'w')
             r.writedata(f)
             f.close()
-        elif self.type == b'SC':
-            r = build78romSC.rom(self.fname)
+        elif self.type == b'SG':
+            r = build78romSG.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+        elif self.type == b'SGEF':
+            r = build78romSGEF.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
             r.writedata(f)
