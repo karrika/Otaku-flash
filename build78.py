@@ -6,6 +6,7 @@ import build78rom48k
 import build78rom78AB
 import build78romSG
 import build78romSGEF
+import build78romSGER
 
 class rom:
     def __init__(self, fname):
@@ -40,6 +41,12 @@ class rom:
                 self.type = b'SGEF'
             else:
                 self.type = b'Not supported'
+        if self.typeB & 4:
+            self.CartType.append('EXRAM')
+            if self.type == b'SG':
+                self.type = b'SGER'
+            else:
+                self.type = b'Not supported'
         if self.typeA & 32:
             self.CartType.append('BANKSET')
             self.type = b'Not supported'
@@ -55,9 +62,6 @@ class rom:
             self.type = b'Not supported'
         if self.typeB & 8:
             self.CartType.append('EXROM')
-            self.type = b'Not supported'
-        if self.typeB & 4:
-            self.CartType.append('EXRAM')
             self.type = b'Not supported'
         if self.typeA & 128:
             self.CartType.append('POKEY @0800')
@@ -154,6 +158,12 @@ class rom:
             f.close()
         elif self.type == b'SGEF':
             r = build78romSGEF.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+        elif self.type == b'SGER':
+            r = build78romSGER.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
             r.writedata(f)
