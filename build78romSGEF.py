@@ -63,8 +63,8 @@ int main() {
     set_sys_clock_pll(1600000000, 4, 1);
     
     // GPIO setup.
-    gpio_init_mask(0x67fffff);         // All pins.
-    gpio_set_dir_in_masked(0x6007fff); // Address and RW pins.
+    gpio_init_mask(0xe7fffff);         // All pins.
+    gpio_set_dir_in_masked(0xe007fff); // Address and RW pins.
     gpio_set_dir_out_masked(0x7f8000); // Data pins.
     gpio_set_function(A15, GPIO_FUNC_NULL);
     gpio_set_function(RW, GPIO_FUNC_NULL);

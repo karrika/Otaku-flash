@@ -51,8 +51,8 @@ int main() {
     set_sys_clock_pll(1164000000, 4, 1);
     
     // GPIO setup.
-    gpio_init_mask(0x67fffff);         // All pins.
-    gpio_set_dir_in_masked(0x6007fff); // Address pins.
+    gpio_init_mask(0xe7fffff);         // All pins.
+    gpio_set_dir_in_masked(0xe007fff); // Address pins.
     gpio_set_dir_out_masked(0x7f8000); // Data pins.
     
     // Continually check address lines and
