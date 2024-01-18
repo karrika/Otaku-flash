@@ -10,9 +10,9 @@ class rom:
         code = '''
 /*
 * Otaku-flash
-* Simulate an SuperGame Atari 7800 ROM chip with a Raspberry Pi Pico.
+* Simulate an SuperGame with EXFIX Atari 7800 ROM chip with a Raspberry Pi Pico.
 *
-* Last 16k bank 7 at C000 is fixed
+* Last 16k bank 7 at C000 is fixed and bank 6 at 4000 is also fixed
 * a write to area 8000-BFFF chooses the 16k bank for the 8000 area
 *
 * Karri Kaksonen, 2024
