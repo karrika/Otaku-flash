@@ -23,12 +23,7 @@ class rom:
 #include <stdlib.h>
 #include <string.h>
 
-void setup_rom_contents();
-
 #define ROM_SIZE 0x4000
-#define ROM_IN_USE 0x4000
-#define ROM_MASK 0x3fff
-#define ADDR_MASK 0x7FFF
 
 uint8_t game_contents[ROM_SIZE] __attribute__ ((aligned(ROM_SIZE))) = {
 '''
@@ -45,17 +40,15 @@ uint8_t game_contents[ROM_SIZE] __attribute__ ((aligned(ROM_SIZE))) = {
 };
 
 uint8_t rom_contents[ROM_SIZE] = {};
-uint32_t addr;
-uint8_t rom_in_use;
-uint8_t new_rom_in_use;
-
-void setup_rom_contents() {
-    memcpy(rom_contents, game_contents, ROM_SIZE);
-} 
 
 int main() {
-    // Specify contents of emulated ROM.
-    setup_rom_contents();
+    uint32_t rawaddr;
+    uint16_t addr;
+    uint8_t rom_in_use;
+    uint8_t new_rom_in_use;
+
+    // Set contents of emulated ROM.
+    memcpy(rom_contents, game_contents, ROM_SIZE);
     rom_in_use = 1;
 
     // Set system clock speed.
@@ -72,18 +65,20 @@ int main() {
     // put associated data on bus.
     while (true) {
         // Get address
-        addr = gpio_get_all();
-        // Put data corresponding to address
-        gpio_put_masked(0x7f8000, rom_contents[addr & ROM_MASK] << 15);
-
-        // Disable data bus output if it was a ROM access
-	new_rom_in_use = (addr & ROM_IN_USE) ? 1 : 0;
-        if (new_rom_in_use != rom_in_use) {
-            rom_in_use = 1 - rom_in_use;
-            if (rom_in_use) {
+        rawaddr = gpio_get_all();
+        addr = rawaddr & 0x3fff;
+        // Check for A14
+        if (rawaddr & 0x4000) {
+            // Set the data on the bus
+            gpio_put_masked(0x7f8000, rom_contents[addr] << 15);
+            if (!rom_in_use) {
                 gpio_set_dir_out_masked(0x7f8000);
-            } else {
+                rom_in_use = 1;
+            }
+        } else {
+            if (rom_in_use) {
                 gpio_set_dir_in_masked(0x7f8000);
+                rom_in_use = 0;
             }
         }
     }
