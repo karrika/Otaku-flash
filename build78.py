@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import build78rom8k
 import build78rom16k
 import build78rom32k
 import build78rom48k
@@ -23,7 +24,9 @@ class rom:
         print('Name:', self.name)
         self.size = int.from_bytes(self.header[49:53], 'big')
         print('Size:', self.size)
-        if self.size == 16384:
+        if self.size == 8192:
+            self.type = b'8K'
+        elif self.size == 16384:
             self.type = b'16K'
         elif self.size == 32768:
             self.type = b'32K'
@@ -126,7 +129,13 @@ class rom:
 
     def createrom(self):
         self.carttype()
-        if self.type == b'16K':
+        if self.type == b'8K':
+            r = build78rom8k.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+        elif self.type == b'16K':
             r = build78rom16k.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
