@@ -26,9 +26,6 @@ class rom:
 void setup_rom_contents();
 
 #define ROM_SIZE 0x8000
-#define ROM_IN_USE 0xC000
-#define ROM_MASK 0x7fff
-#define ADDR_MASK 0xFFFF
 
 uint8_t game_contents[ROM_SIZE] __attribute__ ((aligned(ROM_SIZE))) = {
 '''
@@ -45,17 +42,14 @@ uint8_t game_contents[ROM_SIZE] __attribute__ ((aligned(ROM_SIZE))) = {
 };
 
 uint8_t rom_contents[0x10000] = {};
-uint32_t addr;
-uint8_t rom_in_use;
-uint8_t new_rom_in_use;
-
-void setup_rom_contents() {
-    memcpy(rom_contents + 0x8000, game_contents, ROM_SIZE);
-} 
 
 int main() {
-    // Specify contents of emulated ROM.
-    setup_rom_contents();
+    uint32_t rawaddr;
+    uint16_t addr;
+    uint8_t rom_in_use;
+
+    // Set contents of emulated ROM.
+    memcpy(rom_contents + 0x8000, game_contents, ROM_SIZE);
     rom_in_use = 1;
 
     // Set system clock speed.
@@ -73,24 +67,22 @@ int main() {
     // put associated data on bus.
     while (true) {
         // Get address
-        addr = gpio_get_all();
+        rawaddr = gpio_get_all();
+        addr = rawaddr & 0x7fff;
         // Check for A15
-	new_rom_in_use = (addr & 0x4000000) ? 1 : 0;
-        addr &= 0x7fff;
-        if (new_rom_in_use) {
+        if (rawaddr & 0x4000000) {
              addr |= 0x8000;
-        }
-        // Set the data on the bus anyway
-        gpio_put_masked(0x7f8000, rom_contents[addr] << 15);
-
-        // Disable data bus output if it was a ROM access
-        if (new_rom_in_use != rom_in_use) {
-            rom_in_use = 1 - rom_in_use;
-            if (rom_in_use) {
-                gpio_set_dir_out_masked(0x7f8000);
-            } else {
-                gpio_set_dir_in_masked(0x7f8000);
-            }
+             // Set the data on the bus
+             gpio_put_masked(0x7f8000, rom_contents[addr] << 15);
+             if (!rom_in_use) {
+                 gpio_set_dir_out_masked(0x7f8000);
+                 rom_in_use = 1;
+             }
+        } else {
+             if (rom_in_use) {
+                 gpio_set_dir_in_masked(0x7f8000);
+                 rom_in_use = 0;
+             }
         }
     }
 }
