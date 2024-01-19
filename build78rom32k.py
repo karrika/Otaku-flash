@@ -23,8 +23,6 @@ class rom:
 #include <stdlib.h>
 #include <string.h>
 
-void setup_rom_contents();
-
 #define ROM_SIZE 0x8000
 
 uint8_t game_contents[ROM_SIZE] __attribute__ ((aligned(ROM_SIZE))) = {
