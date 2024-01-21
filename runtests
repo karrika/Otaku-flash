@@ -1,0 +1,12 @@
+echo 2600 2k - Breakout
+./build26 Breakout\ \-\ Breakaway\ IV\ \(1978\)\ \(Atari\)\ \(PAL\)\ \[\!\].a26
+echo 2600 4k - Breakout
+./build26 Warlords\ \(1981\)\ \(Atari\)\ \(PAL\)\ \[\!\].a26
+echo 2600 F8 - Battlezone
+./build26 Battlezone\ \(1983\)\ \(Atari\)\ \[\!\].a26
+echo 2600 F8SC - Elevator Action
+./build26 Elevator\ Action\ \(Atari\)\ \(Prototype\).a26
+echo 2600 F6 - Happybird
+./build26 happybird.a26
+echo 2600 F6SC - Klax
+./build26 Klax\ \(1990\)\ \(Atari\)\ \(PAL\)\ \[\!\].a26
