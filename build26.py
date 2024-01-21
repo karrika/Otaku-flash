@@ -7,6 +7,7 @@ import build26romF4SC
 import build26romF6
 import build26romF6SC
 import build26romF8
+import build26romF8SC
 
 class rom:
     def __init__(self, fname):
@@ -60,6 +61,12 @@ class rom:
             f.close()
         elif self.type == b'F8*':
             r = build26romF8.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+        elif self.type == b'F8SC*':
+            r = build26romF8SC.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
             r.writedata(f)
