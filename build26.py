@@ -4,6 +4,7 @@ import build26rom2k
 import build26rom4k
 import build26romF4
 import build26romF6
+import build26romF6SC
 import build26romF8
 
 class rom:
@@ -40,6 +41,12 @@ class rom:
             f.close()
         elif self.type == b'F6*':
             r = build26romF6.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+        elif self.type == b'F6SC*':
+            r = build26romF6SC.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
             r.writedata(f)
