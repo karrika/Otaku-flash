@@ -64,7 +64,7 @@ int main() {
         addr = rawaddr & 0x0fff;
         // Check for rom access
         if (rawaddr & 0x1000) {
-            // Det data on the bus
+            // Put data on the bus
             gpio_put_masked(0x7f8000, rom_contents[addr + bank] << 15);
             if (!rom_in_use) {
                 gpio_set_dir_out_masked(0x7f8000);
