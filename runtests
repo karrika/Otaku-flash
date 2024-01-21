@@ -10,3 +10,7 @@ echo 2600 F6 - Happybird
 ./build26 happybird.a26
 echo 2600 F6SC - Klax
 ./build26 Klax\ \(1990\)\ \(Atari\)\ \(PAL\)\ \[\!\].a26
+echo 2600 F4 - Slideboy
+./build26 slideboy_final.bin
+echo 2600 F4SC - Fatal Run
+./build26 Fatal\ Run\ \(1990\)\ \(Atari\)\ \(PAL\)\ \[\!\].a26
