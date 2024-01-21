@@ -3,6 +3,7 @@ import subprocess
 import build26rom2k
 import build26rom4k
 import build26romF4
+import build26romF4SC
 import build26romF6
 import build26romF6SC
 import build26romF8
@@ -35,6 +36,12 @@ class rom:
             f.close()
         elif self.type == b'F4*':
             r = build26romF4.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+        elif self.type == b'F4SC*':
+            r = build26romF4SC.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
             r.writedata(f)
