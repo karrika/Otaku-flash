@@ -21,6 +21,7 @@ class rom:
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
 #include <stdlib.h>
+#include <string.h>
 
 #define ROM_SIZE 0x1000
 
@@ -48,6 +49,7 @@ int main() {
 
     rom_in_use = 1;
     bank = 0;
+    memcpy(ram_bank, rom_contents, 128);
 
     // Set system clock speed.
     // 291 MHz
@@ -68,24 +70,25 @@ int main() {
         if (rawaddr & 0x1000) {
                 rawaddr = gpio_get_all();
                 if ((rawaddr & 0x1f80) == 0x1080) {
-                    addr = rawaddr & 0x0fff;
+                    addr = rawaddr & 0x7f;
                     // Read RAM
-                    gpio_put_masked(0x7f8000, ram_bank[addr & 0x7f] << 15);
+                    gpio_put_masked(0x7f8000, ram_bank[addr] << 15);
                     if (!rom_in_use) {
                         gpio_set_dir_out_masked(0x7f8000);
                         rom_in_use = 1;
                     }
                 } else {
                     rawaddr = gpio_get_all();
-                    addr = rawaddr & 0xfff;
                     if ((rawaddr & 0x1f80) == 0x1000) {
                         // Write RAM
                         gpio_set_dir_in_masked(0x7f8000);
                         rawaddr = gpio_get_all();
-                        ram_bank[addr & 0x7f] = (rawaddr >> 15) & 0xff;
+                        addr = rawaddr & 0x7f;
+                        ram_bank[addr] = (rawaddr >> 15) & 0xff;
                         rom_in_use = 0;
                     } else {
                         // Set data on the bus
+                        addr = rawaddr & 0xfff;
                         gpio_put_masked(0x7f8000, rom_contents[addr + bank] << 15);
                         if (!rom_in_use) {
                             gpio_set_dir_out_masked(0x7f8000);
