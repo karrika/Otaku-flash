@@ -9,7 +9,8 @@ class rom:
         code = '''
 /*
 * Otaku-flash
-* Simulate a 16k Atari 2600 ROM chip with F6 bankswitching on a Raspberry Pi Pico.
+* Simulate a 16k Atari 2600 ROM chip with F6 bankswitching on a
+* Raspberry Pi Pico.
 * Karri Kaksonen, 2023
 * based on work by
 * Nick Bild 2021
@@ -21,9 +22,6 @@ class rom:
 #include <stdlib.h>
 
 #define ROM_SIZE 0x1000
-#define ROM_IN_USE 0x1000
-#define ROM_MASK 0x0fff
-#define ADDR_MASK 0x1fff
 
 uint8_t rom_contents[4*ROM_SIZE] __attribute__ ((aligned(4*ROM_SIZE))) = {
 '''
@@ -39,12 +37,12 @@ uint8_t rom_contents[4*ROM_SIZE] __attribute__ ((aligned(4*ROM_SIZE))) = {
         code = '''
 };
 
-uint16_t bank;
-uint32_t addr;
-uint8_t rom_in_use;
-uint8_t new_rom_in_use;
-
 int main() {
+    uint32_t rawaddr;
+    uint16_t addr;
+    uint16_t bank;
+    uint8_t rom_in_use;
+
     rom_in_use = 1;
     bank = 0;
 
@@ -62,35 +60,38 @@ int main() {
     // put associated data on bus.
     while (true) {
         // Get address
-        addr = gpio_get_all();
-        // Put data corresponding to address
-        gpio_put_masked(0x7f8000, rom_contents[(addr & ROM_MASK) + bank] << 15);
-        // Disable data bus output if it was a ROM access
-	new_rom_in_use = (addr & ROM_IN_USE) ? 1 : 0;
-        if (new_rom_in_use != rom_in_use) {
-            rom_in_use = 1 - rom_in_use;
-            if (rom_in_use) {
+        rawaddr = gpio_get_all();
+        addr = rawaddr & 0x0fff;
+        // Check for rom access
+        if (rawaddr & 0x1000) {
+            // Set data on the bus
+            gpio_put_masked(0x7f8000, rom_contents[addr + bank] << 15);
+            if (!rom_in_use) {
                 gpio_set_dir_out_masked(0x7f8000);
-            } else {
-                gpio_set_dir_in_masked(0x7f8000);
+                rom_in_use = 1;
             }
-        }
-        // Do bankswitching
-        switch (addr & ADDR_MASK) {
-        case 0x1ff6:
-            bank = 0;
-            break;
-        case 0x1ff7:
-            bank = 4096;
-            break;
-        case 0x1ff8:
-            bank = 8192;
-            break;
-        case 0x1ff9:
-            bank = 12288;
-            break;
-        default:
-            break;
+            // Do bankswitching
+            switch (rawaddr & 0x1fff) {
+            case 0x1ff6:
+                bank = 0;
+                break;
+            case 0x1ff7:
+                bank = 4096;
+                break;
+            case 0x1ff8:
+                bank = 8192;
+                break;
+            case 0x1ff9:
+                bank = 12288;
+                break;
+            default:
+                break;
+            }
+        } else {
+            if (rom_in_use) {
+                gpio_set_dir_in_masked(0x7f8000);
+                rom_in_use = 0;
+            }
         }
     }
 }
