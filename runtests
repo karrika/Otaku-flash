@@ -18,3 +18,11 @@ echo 7800 8k - Collision
 ./build78 collision.a78
 echo 7800 16k - Centipede
 ./build78 Centipede\ \(NTSC\)\ \(Atari\)\ \(1987\)\ \(020EFE25\).a78
+echo 7800 32k - RType demo
+./build78 RType.a78
+echo 7800 48k - Galaga
+./build78 Galaga\ \(PAL\)\ \(Atari\)\ \(1987\)\ \(5990A9F8\).a78
+echo 7800 AB - F-18 Hornet
+./build78 F-18\ Hornet\ \(PAL\)\ \(Absolute\)\ \(1988\)\ \(E5D714B0\).a78
+echo 7800 SCEF - Crack'ed
+./build78 Crack\'ed\ \(PAL\)\ \(Atari\)\ \(1988\)\ \(50FD19CB\).a78
