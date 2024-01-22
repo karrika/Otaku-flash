@@ -10,7 +10,8 @@ class rom:
         code = '''
 /*
 * Otaku-flash
-* Simulate a 32k Atari 7800 ROM chip with a Raspberry Pi Pico.
+* Simulate a 32k Atari 7800 ROM chip with a
+* Raspberry Pi Pico.
 * Karri Kaksonen, 2024
 * based on work by
 * Nick Bild 2021
@@ -69,18 +70,18 @@ int main() {
         addr = rawaddr & 0x7fff;
         // Check for A15
         if (rawaddr & 0x4000000) {
-             addr |= 0x8000;
-             // Set the data on the bus
-             gpio_put_masked(0x7f8000, rom_contents[addr] << 15);
-             if (!rom_in_use) {
-                 gpio_set_dir_out_masked(0x7f8000);
-                 rom_in_use = 1;
-             }
+            addr |= 0x8000;
+            // Set the data on the bus
+            gpio_put_masked(0x7f8000, rom_contents[addr] << 15);
+            if (!rom_in_use) {
+                gpio_set_dir_out_masked(0x7f8000);
+                rom_in_use = 1;
+            }
         } else {
-             if (rom_in_use) {
-                 gpio_set_dir_in_masked(0x7f8000);
-                 rom_in_use = 0;
-             }
+            if (rom_in_use) {
+                gpio_set_dir_in_masked(0x7f8000);
+                rom_in_use = 0;
+            }
         }
     }
 }

@@ -10,7 +10,8 @@ class rom:
         code = '''
 /*
 * Otaku-flash
-* Simulate a 16k Atari 7800 ROM chip with a Raspberry Pi Pico.
+* Simulate a 16k Atari 7800 ROM chip with a
+* Raspberry Pi Pico.
 * Karri Kaksonen, 2023
 * based on work by
 * Nick Bild 2021
