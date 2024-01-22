@@ -41,6 +41,8 @@ uint8_t rom_contents[4*ROM_SIZE] __attribute__ ((aligned(4*ROM_SIZE))) = {
 
 uint8_t ram_bank[128];
 
+uint8_t message[128] = "A quick brown fox jumped over a lazy old dog. You've tuned to Radio Caroline, home of the good guys. It's now exactly 8 o'clock.";
+
 int main() {
     uint32_t rawaddr;
     uint16_t addr;
@@ -49,7 +51,7 @@ int main() {
 
     rom_in_use = 1;
     bank = 0;
-    memcpy(ram_bank, rom_contents, 128);
+    memcpy(ram_bank, message, 128);
 
     // Set system clock speed.
     // 291 MHz

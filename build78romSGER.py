@@ -10,7 +10,8 @@ class rom:
         code = '''
 /*
 * Otaku-flash
-* Simulate an SuperGame with EXRAM Atari 7800 ROM chip with a Raspberry Pi Pico.
+* Simulate an SuperGame with EXRAM Atari 7800 ROM chip with a
+* Raspberry Pi Pico.
 *
 * Last 16k bank 7 at C000 is fixed
 * There is also a 16k RAM bank at 4000
@@ -144,9 +145,11 @@ int main() {
                 }
             }
         } else {
+            rawaddr = gpio_get_all();
             // EXRAM at 0x4000
-            if (addr & 0x4000) {
-                gpio_put_masked(0x7f8000, rom_contents[(addr & 0x3fff) + 0x20000] << 15);
+            if (rawaddr & 0x4000) {
+                addr = rawaddr & 0x3fff;
+                gpio_put_masked(0x7f8000, rom_contents[addr + 0x20000] << 15);
                 rawaddr = gpio_get_all() & 0x6004000;
 	        if (rawaddr == 0x2004000) {
                     // Read cycle
