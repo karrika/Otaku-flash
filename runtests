@@ -14,3 +14,7 @@ echo 2600 F4 - Slideboy
 ./build26 slideboy_final.bin
 echo 2600 F4SC - Fatal Run
 ./build26 Fatal\ Run\ \(1990\)\ \(Atari\)\ \(PAL\)\ \[\!\].a26
+echo 7800 8k - Collision
+./build78 collision.a78
+echo 7800 16k - Centipede
+./build78 Centipede\ \(NTSC\)\ \(Atari\)\ \(1987\)\ \(020EFE25\).a78
