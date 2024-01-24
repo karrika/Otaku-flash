@@ -14,31 +14,17 @@ my Atari 7800 console. The schottky diode in the cart prevents the
 powerbank to power on the console when the cart has power but the
 console has not.
 
-The new Atari 2600+ works with the cart without any powerbank startup tricks.
+The new Atari 2600+ does not have a startup problem. But the Otaku cart
+may draw too much current so I am also using the powerbank when the cart
+is in the 2600+.
 
-build26rom2k.py games tested:
-- Breakout - Breakaway IV (1978) (Atari) (PAL) [!].a26
-- Basketball (1978) (Atari).a26
+The cart has a 2600 connector and a 7800 connector. The 7800 connector can
+be used for running all games. The 2600 connector only works for 2600 games.
 
-build26rom4k.py games tested:
-- Donkey Kong (198x).a26
+Programming the cart:
+- keep the button pressed while inserting the USB cable to the PC
+- release the button
+- drag a a game.uf2 file to the folder opened by the Otaku card
 
-build26romF8.py games tested:
-- Battlezone (1983) (Atari) [!].a26
-
-build26romF6.py games tested:
-- Happy Bird by @bsteux
-
-build26romF4.py games tested:
-- slideboy_final.bin by @vhzc
-
-build78rom16k.py games tested:
-- Centipede (NTSC) (Atari) (1978).a78
-
-build78rom32k.py games tested:
-- xshuriken by Fabrizio Caruso
-- Pirate Cove by @karri
-
-build78rom48k.py games tested:
-- Galaga (PAL) (Atari) (1987) (5990A9F8).a78
-
+For converting a game into the uf2 format you need to install Raspberry Pico
+tools with the SDK kit.
