@@ -1,6 +1,0 @@
-python3 build78rom32k.py Xshuriken_atari7800.a78
-mv rom.c ~/raspberry-pi-pico/pico/pico-examples/pico_rom
-pushd ~/raspberry-pi-pico/pico/pico-examples/build
-make
-popd
-mv ~/raspberry-pi-pico/pico/pico-examples/build/pico_rom/pico_rom.uf2 xshuriken32k.uf2

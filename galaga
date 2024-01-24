@@ -1,6 +1,0 @@
-python3 build78rom48k.py Galaga\ \(PAL\)\ \(Atari\)\ \(1987\)\ \(5990A9F8\).a78
-mv rom.c ~/raspberry-pi-pico/pico/pico-examples/pico_rom
-pushd ~/raspberry-pi-pico/pico/pico-examples/build
-make
-popd
-mv ~/raspberry-pi-pico/pico/pico-examples/build/pico_rom/pico_rom.uf2 galaga48k.uf2
