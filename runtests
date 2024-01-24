@@ -24,7 +24,7 @@ echo 7800 48k - Galaga
 ./build78 Galaga\ \(PAL\)\ \(Atari\)\ \(1987\)\ \(5990A9F8\).a78
 echo 7800 AB - F-18 Hornet
 ./build78 F-18\ Hornet\ \(PAL\)\ \(Absolute\)\ \(1988\)\ \(E5D714B0\).a78
-echo 7800 SCEF - Crack'ed
+echo 7800 SGEF - Crack'ed
 ./build78 Crack\'ed\ \(PAL\)\ \(Atari\)\ \(1988\)\ \(50FD19CB\).a78
-echo 7800 SCER - 1942
+echo 7800 SGER - 1942
 ./build78 1942\ \(Concerto\ \-\ Small\ ROM\ Build\)\ \(Single Background\)\ \(No Music\)\ \(20221011\).a78
