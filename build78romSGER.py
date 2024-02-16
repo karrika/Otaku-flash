@@ -53,6 +53,7 @@ int main() {
     uint32_t rawaddr;
     uint32_t addr;
     uint32_t bank;
+    uint32_t newbank;
     uint8_t rom_in_use;
     uint8_t readwrite;
 
@@ -114,33 +115,9 @@ int main() {
                         gpio_set_dir_in_masked(0x7f8000);
                         // Check for 0x01
                         rawaddr = gpio_get_all();
-                        switch ((rawaddr >> 15) & 0xff) {
-                        case 0:
-                            bank = 0;
-                            break;
-                        case 1:
-                            bank = 0x4000;
-                            break;
-                        case 2:
-                            bank = 0x8000;
-                            break;
-                        case 3:
-                            bank = 0xc000;
-                            break;
-                        case 4:
-                            bank = 0x10000;
-                            break;
-                        case 5:
-                            bank = 0x14000;
-                            break;
-                        case 6:
-                            bank = 0x18000;
-                            break;
-                        case 7:
-                            bank = 0x1c000;
-                            break;
-                        default:
-                            break;
+                        newbank = ((rawaddr >> 15) & 0xff) * 0x4000;
+                        if (newbank < ROM_SIZE) {
+                            bank = newbank;
                         }
                         rom_in_use = 0;
                     }
