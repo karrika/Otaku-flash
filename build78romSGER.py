@@ -47,7 +47,8 @@ class rom:
         code = '''
 };
 
-uint8_t ram_contents[ROM_SIZE + 0x4000] = {};
+uint8_t ram_contents[ROM_SIZE] __attribute__ ((aligned(0x10000))) = {};
+uint8_t exram_contents[0x4000] __attribute__ ((aligned(0x100))) = {};
 
 int main() {
     uint32_t rawaddr;
@@ -128,7 +129,7 @@ int main() {
             // EXRAM at 0x4000
             if (rawaddr & 0x4000) {
                 addr = rawaddr & 0x3fff;
-                gpio_put_masked(0x7f8000, ram_contents[addr + ROM_SIZE] << 15);
+                gpio_put_masked(0x7f8000, exram_contents[addr] << 15);
                 rawaddr = gpio_get_all() & 0x6004000;
 	        if (rawaddr == 0x2004000) {
                     // Read cycle
@@ -141,7 +142,7 @@ int main() {
                         // Write cycle
                         gpio_set_dir_in_masked(0x7f8000);
                         rawaddr = gpio_get_all();
-                        ram_contents[(rawaddr & 0x3fff) + ROM_SIZE] = (rawaddr >> 15) & 0xff;
+                        exram_contents[rawaddr & 0x3fff] = (rawaddr >> 15) & 0xff;
                         rom_in_use = 0;
                     } else {
                         if (rom_in_use) {
