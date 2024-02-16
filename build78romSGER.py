@@ -168,6 +168,7 @@ int main() {
 uint8_t exram_contents[0x4000] __attribute__ ((aligned(0x100))) = {};
 
 int main() {
+    uint32_t oldrawaddr;
     uint32_t rawaddr;
     uint32_t addr;
     uint32_t bank;
@@ -181,9 +182,9 @@ int main() {
     bank = 0;
 
     // Set system clock speed.
-    // 291 MHz
-    vreg_set_voltage(VREG_VOLTAGE_1_20);
-    set_sys_clock_pll(1164000000, 4, 1);
+    // 400 MHz
+    vreg_set_voltage(VREG_VOLTAGE_1_30);
+    set_sys_clock_pll(1600000000, 4, 1);
     
     // GPIO setup.
     gpio_init_mask(0xe7fffff);         // All pins.
