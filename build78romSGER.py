@@ -47,7 +47,7 @@ class rom:
                 f.write("0x{:02x}".format(self.data[i + 7]))
         f.write('};\n')
         f.write('\n')
-        if False:
+        if len(self.data) <= 128 * 1024:
             code = '''
 uint8_t ram_contents[ROM_SIZE] __attribute__ ((aligned(0x10000))) = {};
 uint8_t exram_contents[0x4000] __attribute__ ((aligned(0x100))) = {};
