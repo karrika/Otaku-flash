@@ -82,11 +82,10 @@ int main() {
         addr = rawaddr & 0x7fff;
         // Check for A15
         if (rawaddr & 0x4000000) {
-            addr |= 0x8000;
             // Check for A14
             if (addr & 0x4000) {
                 // Set the data on the bus for fixed bank 7
-                gpio_put_masked(0x7f8000, ram_contents[addr + 0x10000] << 15);
+                gpio_put_masked(0x7f8000, ram_contents[addr + ROM_SIZE - 0x8000] << 15);
                 rawaddr = gpio_get_all() & 0x6004000;
 	        if (rawaddr == 0x6004000) {
                     // Read cycle
@@ -97,7 +96,7 @@ int main() {
                 }
             } else {
                 // Set the data on the bus for active bank
-                gpio_put_masked(0x7f8000, ram_contents[(addr & 0x3fff) + bank] << 15);
+                gpio_put_masked(0x7f8000, ram_contents[addr + bank] << 15);
                 // Check for RW
                 rawaddr = gpio_get_all() & 0x6004000;
 	        if (rawaddr == 0x6000000) {
