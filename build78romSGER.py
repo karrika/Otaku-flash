@@ -31,11 +31,11 @@ class rom:
 #include "pin_definitions.h"
 #include <string.h>
 
-#define ROM_SIZE 0x20000
-
-const uint8_t game_contents[ROM_SIZE] = {
 '''
         f.write(code)
+        f.write('#define ROM_SIZE ' + "0x{:x}".format(len(self.data)) + '\n')
+        f.write('\n')
+        f.write('const uint8_t game_contents[ROM_SIZE] = {\n')
         for i in range(0, len(self.data), 8):
             f.write('    ')
             for j in range(7):
@@ -47,7 +47,7 @@ const uint8_t game_contents[ROM_SIZE] = {
         code = '''
 };
 
-uint8_t rom_contents[0x24000] = {};
+uint8_t ram_contents[ROM_SIZE + 0x4000] = {};
 
 int main() {
     uint32_t rawaddr;
@@ -57,7 +57,7 @@ int main() {
     uint8_t readwrite;
 
     // Specify contents of emulated ROM.
-    memcpy(rom_contents, game_contents, 0x20000);
+    memcpy(ram_contents, game_contents, ROM_SIZE);
     rom_in_use = 1;
     // Set default bank
     bank = 0;
@@ -86,7 +86,7 @@ int main() {
             // Check for A14
             if (addr & 0x4000) {
                 // Set the data on the bus for fixed bank 7
-                gpio_put_masked(0x7f8000, rom_contents[addr + 0x10000] << 15);
+                gpio_put_masked(0x7f8000, ram_contents[addr + 0x10000] << 15);
                 rawaddr = gpio_get_all() & 0x6004000;
 	        if (rawaddr == 0x6004000) {
                     // Read cycle
@@ -97,7 +97,7 @@ int main() {
                 }
             } else {
                 // Set the data on the bus for active bank
-                gpio_put_masked(0x7f8000, rom_contents[(addr & 0x3fff) + bank] << 15);
+                gpio_put_masked(0x7f8000, ram_contents[(addr & 0x3fff) + bank] << 15);
                 // Check for RW
                 rawaddr = gpio_get_all() & 0x6004000;
 	        if (rawaddr == 0x6000000) {
@@ -152,7 +152,7 @@ int main() {
             // EXRAM at 0x4000
             if (rawaddr & 0x4000) {
                 addr = rawaddr & 0x3fff;
-                gpio_put_masked(0x7f8000, rom_contents[addr + 0x20000] << 15);
+                gpio_put_masked(0x7f8000, ram_contents[addr + ROM_SIZE] << 15);
                 rawaddr = gpio_get_all() & 0x6004000;
 	        if (rawaddr == 0x2004000) {
                     // Read cycle
@@ -165,7 +165,7 @@ int main() {
                         // Write cycle
                         gpio_set_dir_in_masked(0x7f8000);
                         rawaddr = gpio_get_all();
-                        rom_contents[(rawaddr & 0x3fff) + 0x20000] = (rawaddr >> 15) & 0xff;
+                        ram_contents[(rawaddr & 0x3fff) + ROM_SIZE] = (rawaddr >> 15) & 0xff;
                         rom_in_use = 0;
                     } else {
                         if (rom_in_use) {
