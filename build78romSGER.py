@@ -4,7 +4,10 @@ class rom:
     def __init__(self, fname):
         with open(fname, 'rb') as f:
             self.raw = f.read()
-            self.data = self.raw[128:]
+            if len(self.raw) % 1024 == 128:
+                self.data = self.raw[128:]
+            else:
+                self.data = self.raw
 
     def writedata(self, f):
         code = '''
