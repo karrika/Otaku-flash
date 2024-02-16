@@ -34,8 +34,9 @@ class rom:
 '''
         f.write(code)
         f.write('#define ROM_SIZE ' + "0x{:x}".format(len(self.data)) + '\n')
+        f.write('#define BANKS ' + "0x{:x}".format(int(len(self.data) / 16384)) + '\n')
         f.write('\n')
-        f.write('const uint8_t game_contents[ROM_SIZE] = {\n')
+        f.write('const uint8_t game_contents[ROM_SIZE] __attribute__ ((aligned(ROM_SIZE))) = {\n')
         for i in range(0, len(self.data), 8):
             f.write('    ')
             for j in range(7):
@@ -44,9 +45,10 @@ class rom:
                 f.write("0x{:02x}".format(self.data[i + 7]) + ',\n')
             else:
                 f.write("0x{:02x}".format(self.data[i + 7]))
-        code = '''
-};
-
+        f.write('};\n')
+        f.write('\n')
+        if False:
+            code = '''
 uint8_t ram_contents[ROM_SIZE] __attribute__ ((aligned(0x10000))) = {};
 uint8_t exram_contents[0x4000] __attribute__ ((aligned(0x100))) = {};
 
@@ -54,7 +56,7 @@ int main() {
     uint32_t rawaddr;
     uint32_t addr;
     uint32_t bank;
-    uint32_t newbank;
+    uint8_t newbank;
     uint8_t rom_in_use;
     uint8_t readwrite;
 
@@ -114,11 +116,124 @@ int main() {
                     if (rawaddr == 0x4000000) {
                         // Bankswitching write
                         gpio_set_dir_in_masked(0x7f8000);
-                        // Check for 0x01
                         rawaddr = gpio_get_all();
-                        newbank = ((rawaddr >> 15) & 0xff) * 0x4000;
-                        if (newbank < ROM_SIZE) {
-                            bank = newbank;
+                        newbank = (rawaddr >> 15) & 0xff;
+                        if (newbank < BANKS) {
+                            bank = newbank * 0x4000;
+                        }
+                        rom_in_use = 0;
+                    }
+                }
+            }
+        } else {
+            rawaddr = gpio_get_all();
+            // EXRAM at 0x4000
+            if (rawaddr & 0x4000) {
+                addr = rawaddr & 0x3fff;
+                gpio_put_masked(0x7f8000, exram_contents[addr] << 15);
+                rawaddr = gpio_get_all() & 0x6004000;
+	        if (rawaddr == 0x2004000) {
+                    // Read cycle
+                    if (!rom_in_use) {
+                        gpio_set_dir_out_masked(0x7f8000);
+                        rom_in_use = 1;
+                    }
+                } else {
+	            if (rawaddr == 0x0004000) {
+                        // Write cycle
+                        gpio_set_dir_in_masked(0x7f8000);
+                        rawaddr = gpio_get_all();
+                        exram_contents[rawaddr & 0x3fff] = (rawaddr >> 15) & 0xff;
+                        rom_in_use = 0;
+                    } else {
+                        if (rom_in_use) {
+                            gpio_set_dir_in_masked(0x7f8000);
+                            rom_in_use = 0;
+                        }
+                    }
+                }
+            } else {
+                if (rom_in_use) {
+                    gpio_set_dir_in_masked(0x7f8000);
+                    rom_in_use = 0;
+                }
+            }
+        }
+    }
+}
+
+'''
+        else:
+            code = '''
+uint8_t exram_contents[0x4000] __attribute__ ((aligned(0x100))) = {};
+
+int main() {
+    uint32_t rawaddr;
+    uint32_t addr;
+    uint32_t bank;
+    uint8_t newbank;
+    uint8_t rom_in_use;
+    uint8_t readwrite;
+
+    // Specify contents of emulated ROM.
+    rom_in_use = 1;
+    // Set default bank
+    bank = 0;
+
+    // Set system clock speed.
+    // 291 MHz
+    vreg_set_voltage(VREG_VOLTAGE_1_20);
+    set_sys_clock_pll(1164000000, 4, 1);
+    
+    // GPIO setup.
+    gpio_init_mask(0xe7fffff);         // All pins.
+    gpio_set_dir_in_masked(0xe007fff); // Address and RW pins.
+    gpio_set_dir_out_masked(0x7f8000); // Data pins.
+    gpio_set_function(A15, GPIO_FUNC_NULL);
+    gpio_set_function(RW, GPIO_FUNC_NULL);
+    
+    // Continually check address lines and
+    // put associated data on bus.
+    while (true) {
+        // Get address
+        rawaddr = gpio_get_all();
+        addr = rawaddr & 0x7fff;
+        // Check for A15
+        if (rawaddr & 0x4000000) {
+            // Check for A14
+            if (addr & 0x4000) {
+                // Set the data on the bus for fixed bank 7
+                gpio_put_masked(0x7f8000, game_contents[addr + ROM_SIZE - 0x8000] << 15);
+                rawaddr = gpio_get_all() & 0x6004000;
+	        if (rawaddr == 0x6004000) {
+                    // Read cycle
+                    if (!rom_in_use) {
+                        gpio_set_dir_out_masked(0x7f8000);
+                        rom_in_use = 1;
+                    }
+                }
+            } else {
+                // Set the data on the bus for active bank
+                gpio_put_masked(0x7f8000, game_contents[addr + bank] << 15);
+                // Check for RW
+                rawaddr = gpio_get_all() & 0x6004000;
+	        if (rawaddr == 0x6000000) {
+                    // Read cycle
+                    if (!rom_in_use) {
+                        gpio_set_dir_out_masked(0x7f8000);
+                        rom_in_use = 1;
+                    }
+                } else {
+                    // Write cycle to ROM
+                    rawaddr = gpio_get_all() & 0x6000000;
+                    // Check for bankswitch
+                    if (rawaddr == 0x4000000) {
+                        // Bankswitching write
+                        gpio_set_dir_in_masked(0x7f8000);
+                        rawaddr = gpio_get_all();
+                        newbank = (rawaddr >> 15) & 0xff;
+                        if (newbank < BANKS) {
+                            bank = newbank * 0x4000;
                         }
                         rom_in_use = 0;
                     }
