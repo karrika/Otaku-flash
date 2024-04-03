@@ -8,6 +8,7 @@ import build26romF6
 import build26romF6SC
 import build26romF8
 import build26romF8SC
+import build26romFE
 
 class rom:
     def __init__(self, fname):
@@ -71,6 +72,13 @@ class rom:
             f = open(fname, 'w')
             r.writedata(f)
             f.close()
+        elif self.type == b'FE*':
+            r = build26romFE.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+            print(self.type, 'the Pico is too slow. Not supported, yet')
         else:
             print(self.type, 'not supported, yet')
 
