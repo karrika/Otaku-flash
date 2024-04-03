@@ -27,4 +27,4 @@ echo 7800 AB - F-18 Hornet
 echo 7800 SGEF - Crack'ed
 ./build78 Crack\'ed\ \(PAL\)\ \(Atari\)\ \(1988\)\ \(50FD19CB\).a78
 echo 7800 SGER - 1942
-./build78 1942\ \(Concerto\ \-\ Small\ ROM\ Build\)\ \(Single Background\)\ \(No Music\)\ \(20221011\).a78
+./build78 1942\ \(Concerto\ \-\ Small\ ROM\ Build\)\ \(Single\ Background\)\ \(No\ Music\)\ \(20221011\).a78
