@@ -8,6 +8,7 @@ import build78romAB
 import build78romSG
 import build78romSGEF
 import build78romSGER
+import build78romSGERP450
 
 class rom:
     def __init__(self, fname):
@@ -83,7 +84,10 @@ class rom:
             self.type = b'Not supported'
         if self.typeB & 64:
             self.CartType.append('POKEY @0450')
-            self.type = b'Not supported'
+            if self.type == b'SGER':
+                self.type = b'SGERP450'
+            else:
+                self.type = b'Not supported'
         if self.typeB & 32:
             self.CartType.append('EXRAM/X2')
             self.type = b'Not supported'
@@ -123,6 +127,10 @@ class rom:
             if self.type == b'AB':
                 pass
             elif self.type == b'SGEF':
+                pass
+            elif self.type == b'SGER':
+                pass
+            elif self.type == b'SGERP450':
                 pass
             else:
                 self.type = b'Not supported'
@@ -173,6 +181,12 @@ class rom:
             f.close()
         elif self.type == b'SGER':
             r = build78romSGER.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+        elif self.type == b'SGERP450':
+            r = build78romSGERP450.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
             r.writedata(f)
