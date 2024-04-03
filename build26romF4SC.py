@@ -21,10 +21,11 @@ class rom:
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
 #include <stdlib.h>
+#include <string.h>
 
 #define ROM_SIZE 0x1000
 
-uint8_t rom_contents[8*ROM_SIZE] __attribute__ ((aligned(8*ROM_SIZE))) = {
+uint8_t game_contents[8*ROM_SIZE] __attribute__ ((aligned(8*ROM_SIZE))) = {
 '''
         f.write(code)
         for i in range(0, len(self.data), 8):
@@ -38,21 +39,27 @@ uint8_t rom_contents[8*ROM_SIZE] __attribute__ ((aligned(8*ROM_SIZE))) = {
         code = '''
 };
 
+uint8_t rom_contents[8*ROM_SIZE] = {};
 uint8_t ram_bank[128];
 
 int main() {
     uint32_t rawaddr;
-    uint16_t addr;
     uint16_t bank;
+    uint16_t addr;
+    uint8_t bankswitch;
     uint8_t rom_in_use;
+    uint8_t value;
 
+    // Set contents of emulated ROM.
+    memcpy(rom_contents, game_contents, 8*ROM_SIZE);
     rom_in_use = 1;
     bank = 0;
+    bankswitch = 0;
 
     // Set system clock speed.
-    // 291 MHz
-    vreg_set_voltage(VREG_VOLTAGE_1_20);
-    set_sys_clock_pll(1164000000, 4, 1);
+    // 400 MHz
+    vreg_set_voltage(VREG_VOLTAGE_1_30);
+    set_sys_clock_pll(1600000000, 4, 1);
     
     // GPIO setup.
     gpio_init_mask(0xe7fffff);         // All pins.
@@ -64,29 +71,24 @@ int main() {
     while (true) {
         // Get address
         rawaddr = gpio_get_all();
-        // Check for rom access
+        // Check for A12
         if (rawaddr & 0x1000) {
-                rawaddr = gpio_get_all();
                 if ((rawaddr & 0x1f80) == 0x1080) {
-                    addr = rawaddr & 0x0fff;
                     // Read RAM
-                    gpio_put_masked(0x7f8000, ram_bank[addr & 0x7f] << 15);
+                    gpio_put_masked(0x7f8000, ram_bank[rawaddr & 0x7f] << 15);
                     if (!rom_in_use) {
                         gpio_set_dir_out_masked(0x7f8000);
                         rom_in_use = 1;
                     }
                 } else {
-                    rawaddr = gpio_get_all();
-                    addr = rawaddr & 0xfff;
                     if ((rawaddr & 0x1f80) == 0x1000) {
                         // Write RAM
                         gpio_set_dir_in_masked(0x7f8000);
-                        rawaddr = gpio_get_all();
-                        ram_bank[addr & 0x7f] = (rawaddr >> 15) & 0xff;
+                        ram_bank[rawaddr & 0x7f] = (gpio_get_all() >> 15) & 0xff;
                         rom_in_use = 0;
                     } else {
                         // Set data on the bus
-                        gpio_put_masked(0x7f8000, rom_contents[addr + bank] << 15);
+                        gpio_put_masked(0x7f8000, rom_contents[(rawaddr & 0xfff) + bank] << 15);
                         if (!rom_in_use) {
                             gpio_set_dir_out_masked(0x7f8000);
                             rom_in_use = 1;
