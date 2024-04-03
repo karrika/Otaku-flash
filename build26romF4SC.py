@@ -44,11 +44,11 @@ uint8_t ram_bank[128];
 
 int main() {
     uint32_t rawaddr;
+    uint32_t newrawaddr;
     uint16_t bank;
     uint16_t addr;
     uint8_t bankswitch;
     uint8_t rom_in_use;
-    uint8_t value;
 
     // Set contents of emulated ROM.
     memcpy(rom_contents, game_contents, 8*ROM_SIZE);
@@ -69,8 +69,15 @@ int main() {
     // Continually check address lines and
     // put associated data on bus.
     while (true) {
-        // Get address
-        rawaddr = gpio_get_all();
+        // Wait for data to change
+        do {
+            rawaddr = gpio_get_all();
+        } while (newrawaddr == rawaddr);
+        // Wait for data to stabilize
+        do {
+            newrawaddr = rawaddr;
+            rawaddr = gpio_get_all();
+        } while (newrawaddr != rawaddr);
         // Check for A12
         if (rawaddr & 0x1000) {
                 if ((rawaddr & 0x1f80) == 0x1080) {
