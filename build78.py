@@ -9,6 +9,7 @@ import build78romSG
 import build78romSGEF
 import build78romSGER
 import build78romSGERP450
+import build78romSGERYMP450
 
 class rom:
     def __init__(self, fname):
@@ -72,7 +73,10 @@ class rom:
             self.type = b'Not supported'
         if self.typeA & 8:
             self.CartType.append('YM2151 @0461')
-            self.type = b'Not supported'
+            if self.type == b'SGER':
+                self.type = b'SGERYM'
+            else:
+                self.type = b'Not supported'
         if self.typeA & 4:
             self.CartType.append('POKEY @0440')
             self.type = b'Not supported'
@@ -86,6 +90,8 @@ class rom:
             self.CartType.append('POKEY @0450')
             if self.type == b'SGER':
                 self.type = b'SGERP450'
+            elif self.type == b'SGERYM':
+                self.type = b'SGERYMP450'
             else:
                 self.type = b'Not supported'
         if self.typeB & 32:
@@ -131,6 +137,8 @@ class rom:
             elif self.type == b'SGER':
                 pass
             elif self.type == b'SGERP450':
+                pass
+            elif self.type == b'SGERYMP450':
                 pass
             else:
                 self.type = b'Not supported'
@@ -187,6 +195,12 @@ class rom:
             f.close()
         elif self.type == b'SGERP450':
             r = build78romSGERP450.rom(self.fname)
+            fname = 'rom.c'
+            f = open(fname, 'w')
+            r.writedata(f)
+            f.close()
+        elif self.type == b'SGERYMP450':
+            r = build78romSGERYMP450.rom(self.fname)
             fname = 'rom.c'
             f = open(fname, 'w')
             r.writedata(f)
